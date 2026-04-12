@@ -1,0 +1,76 @@
+name: Publish Docker Image to GitHub Container Registry, and deploy to Coolify Web Server
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+      - main
+      # - feature/devops
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    # if: github.actor == 'onukwilip' || github.actor == 'wificombatacademy'
+    env:
+      REPOSITORY: wifi-combat-backend-api
+      IMAGE_LATEST: ghcr.io/${{ secrets.GH_USERNAME }}/wifi-combat-backend-api:latest
+      IMAGE_SHA: ghcr.io/${{ secrets.GH_USERNAME }}/wifi-combat-backend-api:${{ github.sha }} 
+    steps:
+      # Step 1: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login Docker
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GH_USERNAME }}
+          password: ${{ secrets.GH_TOKEN }}
+
+      # Step 2: Build the Docker image and push to GitHub container registry
+      - name: Build, tag, and push docker image to GitHub container registry
+        run: |
+          docker build \
+            --build-arg SECRET_KEY="${{ secrets.SECRET_KEY }}" \
+            --build-arg DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+            --build-arg APP_NAME="${{ secrets.APP_NAME }}" \
+            --build-arg DEBUG="${{ secrets.DEBUG }}" \
+            --build-arg APP_ENV="${{ secrets.APP_ENV }}" \
+            --build-arg AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
+            --build-arg AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
+            --build-arg AWS_DEFAULT_REGION="${{ secrets.AWS_DEFAULT_REGION }}" \
+            --build-arg AWS_STORAGE_BUCKET_NAME="${{ secrets.AWS_STORAGE_BUCKET_NAME }}" \
+            --build-arg DB_HOST="${{ secrets.DB_HOST }}" \
+            --build-arg DB_PORT="${{ secrets.DB_PORT }}" \
+            --build-arg DB_DATABASE="${{ secrets.DB_DATABASE }}" \
+            --build-arg DB_USERNAME="${{ secrets.DB_USERNAME }}" \
+            --build-arg DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+            --build-arg SESSION_DRIVER="${{ secrets.SESSION_DRIVER }}" \
+            --build-arg CACHE_DRIVER="${{ secrets.CACHE_DRIVER }}" \
+            --build-arg REDIS_HOST="${{ secrets.REDIS_HOST }}" \
+            --build-arg REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}" \
+            --build-arg REDIS_PORT="${{ secrets.REDIS_PORT }}" \
+            --build-arg SESSION_CONNECTION="${{ secrets.SESSION_CONNECTION }}" \
+            --build-arg MAIL_DRIVER="${{ secrets.MAIL_DRIVER }}" \
+            --build-arg MAIL_HOST="${{ secrets.MAIL_HOST }}" \
+            --build-arg MAIL_PORT="${{ secrets.MAIL_PORT }}" \
+            --build-arg MAIL_USERNAME="${{ secrets.MAIL_USERNAME }}" \
+            --build-arg MAIL_PASSWORD="${{ secrets.MAIL_PASSWORD }}" \
+            --build-arg MAIL_ENCRYPTION="${{ secrets.MAIL_ENCRYPTION }}" \
+            --build-arg FLUTERWAVE_PUBLIC_KEY="${{ secrets.FLUTERWAVE_PUBLIC_KEY }}" \
+            --build-arg FLUTERWAVE_SECRET_KEY="${{ secrets.FLUTERWAVE_SECRET_KEY }}" \
+            --build-arg FLUTTERWAVE_SECRET_HASH="${{ secrets.FLUTTERWAVE_SECRET_HASH }}" \
+            --build-arg REDIS_URL="${{ secrets.REDIS_URL }}" \
+            --build-arg OPENAI_API_KEY="${{ secrets.OPENAI_API_KEY }}" \
+            -f Dockerfile \
+            -t ${{ env.IMAGE_LATEST }} \
+            -t ${{ env.IMAGE_SHA }} .
+          docker push ${{ env.IMAGE_LATEST }}
+          docker push ${{ env.IMAGE_SHA }}
+
+      # Step 6: Re-deploy the app container to Coolify
+      - name: Trigger Coolify re-deployment
+        if: github.ref == 'refs/heads/main'
+        run: |
+          curl --request GET "${{ secrets.COOLIFY_WEBHOOK_URL }}" --header "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}"

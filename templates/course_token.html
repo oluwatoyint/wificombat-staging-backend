@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Course Access Token</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f6f9fc; font-family: Arial, sans-serif; line-height: 1.6;">
+    <table cellpadding="0" cellspacing="0" width="100%" style="min-width: 320px; max-width: 600px; margin: 0 auto; background-color: white;">
+        <tr>
+            <td style="padding: 40px 20px; text-align: center; background-color: #1a56db;">
+                <img src="/api/placeholder/150/50" alt="School Logo" style="width: 150px; height: auto;">
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 40px 30px;">
+                <h1 style="color: #1a56db; margin: 0 0 20px; font-size: 24px;">Your Course Access Token</h1>
+                <p style="color: #4a5568; margin: 0 0 20px;">Dear {{email}},</p>
+                <p style="color: #4a5568; margin: 0 0 20px;">Your access token for <strong>{{pathway_title}}</strong> has been generated. Here are your course details:</p>
+                
+                <div style="background-color: #f8fafc; border-radius: 8px; padding: 30px; margin: 30px 0; text-align: center;">
+                    <h2 style="color: #1a56db; font-size: 32px; margin: 0 0 10px; letter-spacing: 2px;">{{token}}</h2>
+                    <p style="color: #64748b; margin: 0; font-size: 14px;">Your Unique Access Token</p>
+                </div>
+
+                <table cellpadding="0" cellspacing="0" width="100%" style="margin: 0 0 30px;">
+                    <tr>
+                        <td style="padding: 15px; border-bottom: 1px solid #e2e8f0;">
+                            <p style="margin: 0; color: #64748b; font-size: 14px;">Course</p>
+                            <p style="margin: 5px 0 0; color: #1e293b; font-weight: bold;">{{pathway_title}}</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 15px; border-bottom: 1px solid #e2e8f0;">
+                            <p style="margin: 0; color: #64748b; font-size: 14px;">Term</p>
+                            <p style="margin: 5px 0 0; color: #1e293b; font-weight: bold;">{{term}}</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 15px; border-bottom: 1px solid #e2e8f0;">
+                            <p style="margin: 0; color: #64748b; font-size: 14px;">Valid Until</p>
+                            <p style="margin: 5px 0 0; color: #1e293b; font-weight: bold;">{{expiry_date}}</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{course_url}" style="display: inline-block; padding: 14px 30px; background-color: #1a56db; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">Access Course</a>
+                </div>
+
+                <p style="color: #4a5568; margin: 20px 0; font-size: 14px;">If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
+                
+                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;">
+                
+                <p style="color: #64748b; margin: 0; font-size: 12px; text-align: center;">This is an automated message. Please do not reply to this email.</p>
+            </td>
+        </tr>
+        <tr>
+            <td style="background-color: #f8fafc; padding: 20px; text-align: center;">
+                <p style="color: #64748b; margin: 0; font-size: 12px;">© 2025 Your School Name. All rights reserved.</p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

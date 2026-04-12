@@ -1,0 +1,164 @@
+name: Publish Django app to S3 bucket and AWS Lambda using Zappa
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - feature/devops
+  #     - develop
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    env:
+      REPOSITORY: wifi-combat-backend-api
+      IMAGE_TAG: ${{ github.sha }}
+      AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+      AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+      AWS_DEFAULT_REGION: ${{secrets.AWS_DEFAULT_REGION}}
+    steps:
+      # Step 1: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up python
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Step 2: Set up AWS CLI
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: ${{env.AWS_DEFAULT_REGION}}
+          aws-access-key-id: ${{env.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{env.AWS_SECRET_ACCESS_KEY}}
+
+      # Step 3: Log in to Amazon ECR
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+          version: 1.8.2
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        run: |
+          poetry lock
+          poetry install --no-root --no-interaction --no-ansi
+
+      - name: Update setuptools
+        run: |
+              poetry add setuptools
+              sudo apt install python3-setuptools
+              pip install --upgrade setuptools
+
+      - name: Create the .env file
+        run: |
+          cat <<EOT > backend/.env
+          SECRET_KEY="${{ secrets.SECRET_KEY }}"
+          DATABASE_URL="${{ secrets.DATABASE_URL }}"
+          APP_NAME="${{ secrets.APP_NAME }}"
+          DEBUG="${{ secrets.DEBUG }}"
+          APP_ENV="${{ secrets.APP_ENV }}"
+          ADDITIONAL_ALLOWED_HOSTS="${{ secrets.ADDITIONAL_ALLOWED_HOSTS }}"
+
+          AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}"
+          AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+          AWS_DEFAULT_REGION="${{ secrets.AWS_DEFAULT_REGION }}"
+          AWS_STORAGE_BUCKET_NAME="${{ secrets.AWS_STORAGE_BUCKET_NAME }}"
+
+          DB_HOST="${{ secrets.DB_HOST }}"
+          DB_PORT="${{ secrets.DB_PORT }}"
+          DB_DATABASE="${{ secrets.DB_DATABASE }}"
+          DB_USERNAME="${{ secrets.DB_USERNAME }}"
+          DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
+
+          SESSION_DRIVER="${{ secrets.SESSION_DRIVER }}"
+          CACHE_DRIVE="${{ secrets.CACHE_DRIVER }}"
+          REDIS_HOST="${{ secrets.REDIS_HOST }}"
+          REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}"
+          REDIS_PORT="${{ secrets.REDIS_PORT }}"
+          SESSION_CONNECTION="${{ secrets.SESSION_CONNECTION }}"
+
+          MAIL_DRIVER="${{ secrets.MAIL_DRIVER }}"
+          MAIL_HOST="${{ secrets.MAIL_HOST }}"
+          MAIL_PORT="${{ secrets.MAIL_PORT }}"
+          MAIL_USERNAME="${{ secrets.MAIL_USERNAME }}"
+          MAIL_PASSWORD="${{ secrets.MAIL_PASSWORD }}"
+          MAIL_ENCRYPTION="${{ secrets.MAIL_ENCRYPTION }}"
+          EOT
+
+      - name: Verify .env File
+        run: cat backend/.env
+
+      - name: Deploy to AWS with Zappa
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          # Activate the virtual environment
+          source .venv/bin/activate
+          
+          # Install Zappa and AWS CLI in the virtual environment
+          pip install awscli zappa
+          
+          # Configure the CLI
+          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+          aws configure set region $AWS_DEFAULT_REGION
+          
+          # Deploy with Zappa
+          poetry run zappa update dev
+
+      # - name: Update Lambda environment variables
+      #   run: |
+      #     aws lambda update-function-configuration \
+      #       --function-name wifi-combat-backend-api-dev \
+      #       --environment Variables='{
+      #       SECRET_KEY="${{ secrets.SECRET_KEY }}",
+      #         DATABASE_URL="${{ secrets.DATABASE_URL }}",
+      #         APP_NAME="${{ secrets.APP_NAME }}",
+      #         DEBUG="${{ secrets.DEBUG }}",
+      #         APP_ENV="${{ secrets.APP_ENV }}",
+      #         ADDITIONAL_ALLOWED_HOSTS="${{ secrets.ADDITIONAL_ALLOWED_HOSTS }}",
+
+      #         AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}",
+      #         AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}",
+      #         AWS_DEFAULT_REGION="${{ secrets.AWS_DEFAULT_REGION }}",
+      #         AWS_STORAGE_BUCKET_NAME="${{ secrets.AWS_STORAGE_BUCKET_NAME }}",
+
+      #         DB_HOST="${{ secrets.DB_HOST }}",
+      #         DB_PORT="${{ secrets.DB_PORT }}",
+      #         DB_DATABASE="${{ secrets.DB_DATABASE }}",
+      #         DB_USERNAME="${{ secrets.DB_USERNAME }}",
+      #         DB_PASSWORD="${{ secrets.DB_PASSWORD }}",
+
+      #         SESSION_DRIVER="${{ secrets.SESSION_DRIVER }}",
+      #         CACHE_DRIVE="${{ secrets.CACHE_DRIVER }}",
+      #         REDIS_HOST="${{ secrets.REDIS_HOST }}",
+      #         REDIS_PASSWORD="${{ secrets.REDIS_PASSWORD }}",
+      #         REDIS_PORT="${{ secrets.REDIS_PORT }}",
+      #         SESSION_CONNECTION="${{ secrets.SESSION_CONNECTION }}",
+
+      #         MAIL_DRIVER="${{ secrets.MAIL_DRIVER }}",
+      #         MAIL_HOST="${{ secrets.MAIL_HOST }}",
+      #         MAIL_PORT="${{ secrets.MAIL_PORT }}",
+      #         MAIL_USERNAME="${{ secrets.MAIL_USERNAME }}",
+      #         MAIL_PASSWORD="${{ secrets.MAIL_PASSWORD }}",
+      #         MAIL_ENCRYPTION="${{ secrets.MAIL_ENCRYPTION }}" 
+      #     }'

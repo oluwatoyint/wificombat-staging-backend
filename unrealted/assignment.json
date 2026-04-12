@@ -1,0 +1,10 @@
+{
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "assignment": {
+        "id": "450e8400-e29b-41d4-a716-446655440000",
+        "title": "Sample Assignment",
+        "description": "This is a sample assignment description.",
+        "grading_description": "Sample grading description.",
+    },
+    "user_response": "This is a sample response to the assignment.",
+}

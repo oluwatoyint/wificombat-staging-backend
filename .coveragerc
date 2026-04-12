@@ -1,0 +1,26 @@
+[run]
+source = .
+omit = 
+    */tests/*
+    */__init__.py
+    */manage.py
+    */.venv/*
+    */core/*
+    */support/*
+    */backend/*
+    */api/serializers/*
+    */production_tasks/*
+    */api/views/*
+    */api/tests/*
+    */api/payment_providers/*
+    */api/controllers/permissions/*
+    */api/controllers/utils.py/*
+
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if self.debug:
+    raise NotImplementedError
+    if __name__ == .__main__.:
