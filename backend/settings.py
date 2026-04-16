@@ -19,7 +19,7 @@ env = environ.Env(
 env_file = os.path.join(BASE_DIR, ".env")
 if os.path.exists(env_file):
     environ.Env.read_env(env_file)
-    
+
 # 4. Proceed with other settings
 SECRET_KEY = env("SECRET_KEY")
 DEBUG = env("DEBUG", default=False)
@@ -133,7 +133,7 @@ ASGI_APPLICATION = "backend.asgi.application"
 DATABASES = {
     "default": dj_database_url.config(
         conn_max_age=600,
-        default=os.environ.get("DATABASE_URL"),
+        default=os.environ.get("DB_URL_PUBLIC"),
         ssl_require=not DEBUG,  # Enforce SSL in production/staging
     )
 }
