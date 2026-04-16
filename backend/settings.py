@@ -5,15 +5,22 @@ from datetime import timedelta
 import environ
 import dj_database_url
 
+# 1. Define BASE_DIR first
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# 2. Initialize env
 env = environ.Env(
     DEBUG=(bool, False),
     APP_ENV=(str, "production"),
 )
 
-environ.Env.read_env()
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
+# 3. Only read the .env file if it exists (usually only in local dev)
+# This prevents a local .env from overwriting Railway's real variables
+env_file = os.path.join(BASE_DIR, ".env")
+if os.path.exists(env_file):
+    environ.Env.read_env(env_file)
+    
+# 4. Proceed with other settings
 SECRET_KEY = env("SECRET_KEY")
 DEBUG = env("DEBUG", default=False)
 
