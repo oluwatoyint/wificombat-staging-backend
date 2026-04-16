@@ -130,14 +130,14 @@ ASGI_APPLICATION = "backend.asgi.application"
 # DATABASE — Railway injects DATABASE_URL automatically when you add
 # a PostgreSQL plugin to your Railway project.
 # -----------------------------------------------------------------------
-# Use the proxy URL if available, otherwise fall back to the default
-DATABASE_URL_TO_USE = os.getenv("DB_PROXY_URL") or os.getenv("DATABASE_URL")
+# We prioritize DB_PROXY_URL to bypass internal DNS issues
+DB_CONNECTION_STRING = os.getenv("DB_PROXY_URL") or os.getenv("DATABASE_URL")
 
 DATABASES = {
     "default": dj_database_url.config(
-        default=DATABASE_URL_TO_USE,
+        default=DB_CONNECTION_STRING,
         conn_max_age=600,
-        ssl_require=True,
+        ssl_require=True,  # The proxy requires SSL
     )
 }
 
