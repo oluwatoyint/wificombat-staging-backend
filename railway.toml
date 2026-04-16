@@ -1,10 +1,11 @@
-
 [build]
 builder = "NIXPACKS"
-buildCommand = "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate --noinput"
+# We remove migration from here
+buildCommand = "pip install -r requirements.txt && python manage.py collectstatic --noinput"
 
 [deploy]
-# We add 'sh -c' here to fix the $PORT error
-startCommand = "sh -c \"python manage.py migrate --noinput && daphne -b 0.0.0.0 -p $PORT backend.asgi:application\""
+# We put migration here so it runs at runtime
+startCommand = "sh -c 'python manage.py migrate --noinput && daphne -b 0.0.0.0 -p $PORT backend.asgi:application'"
 healthcheckPath = "/"
 healthcheckTimeout = 100
+restartPolicyType = "ON_FAILURE"
