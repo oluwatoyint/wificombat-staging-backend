@@ -27,6 +27,9 @@ DEEP_SEEK_API_KEY = env("DEEP_SEEK_API_KEY", default=None)
 # -----------------------------------------------------------------------
 ALLOWED_HOSTS = [
     "backend.wificombatelearn.com",
+    ".railway.app",      # Allows any Railway-provided URL
+    "localhost",         # Allows local testing
+    "127.0.0.1",
 ]
 
 # Railway injects RAILWAY_PUBLIC_DOMAIN automatically
