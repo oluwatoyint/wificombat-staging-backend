@@ -5,4 +5,4 @@ buildCommand = "pip install -r requirements.txt && python manage.py collectstati
 [deploy]
 startCommand = "sh -c 'sleep 5 && python manage.py migrate --noinput && python manage.py create_staging_admin && celery -A backend worker --loglevel=info --concurrency=1 & celery -A backend beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler & daphne -b 0.0.0.0 -p 8000 backend.asgi:application'"
 healthcheckPath = "/"
-healthcheckTimeout = 125
+healthcheckTimeout = 120
