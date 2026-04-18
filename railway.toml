@@ -3,6 +3,6 @@ builder = "NIXPACKS"
 buildCommand = "pip install -r requirements.txt && python manage.py collectstatic --noinput"
 
 [deploy]
-startCommand = "sh -c 'export REDIS_URL=redis://default:miVcBFnwcQrfSVUeSckLauOMGNbLPfFG@monorail.proxy.rlwy.net:49658 && export CELERY_BROKER_URL=redis://default:miVcBFnwcQrfSVUeSckLauOMGNbLPfFG@monorail.proxy.rlwy.net:49658 && python manage.py migrate --noinput && python manage.py fix_beat_schedule && REDIS_URL=redis://default:miVcBFnwcQrfSVUeSckLauOMGNbLPfFG@monorail.proxy.rlwy.net:49658 celery -A backend beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler & REDIS_URL=redis://default:miVcBFnwcQrfSVUeSckLauOMGNbLPfFG@monorail.proxy.rlwy.net:49658 celery -A backend worker --loglevel=info --concurrency=1 & daphne -b 0.0.0.0 -p 8000 backend.asgi:application'"
+startCommand = "sh -c 'export REDIS_URL=redis://default:miVcBFnwcQrfSVUeSckLauOMGNbLPfFG@monorail.proxy.rlwy.net:49658 && export CELERY_BROKER_URL=redis://default:miVcBFnwcQrfSVUeSckLauOMGNbLPfFG@monorail.proxy.rlwy.net:49658 && python manage.py migrate --noinput && REDIS_URL=redis://default:miVcBFnwcQrfSVUeSckLauOMGNbLPfFG@monorail.proxy.rlwy.net:49658 celery -A backend beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler & REDIS_URL=redis://default:miVcBFnwcQrfSVUeSckLauOMGNbLPfFG@monorail.proxy.rlwy.net:49658 celery -A backend worker --loglevel=info --concurrency=1 & daphne -b 0.0.0.0 -p 8000 backend.asgi:application'"
 healthcheckPath = "/"
 healthcheckTimeout = 120
