@@ -224,9 +224,9 @@ CELERY_ENABLE_UTC = True
 from celery.schedules import crontab
 
 CELERY_BEAT_SCHEDULE = {
-    "run-every-minute": {
-        "task": "core.tasks.my_scheduled_task",
-        "schedule": crontab(minute="*"),
+    "run-daily-streak": {
+        "task": "core.tasks.run_daily_streak_recording",
+        "schedule": crontab(hour=0, minute=0),  # Runs at midnight daily
     },
 }
 
