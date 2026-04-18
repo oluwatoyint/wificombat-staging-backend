@@ -1,11 +1,8 @@
 [build]
 builder = "NIXPACKS"
-# We remove migration from here
 buildCommand = "pip install -r requirements.txt && python manage.py collectstatic --noinput"
 
-
 [deploy]
-# We add 'sleep 5' to wait for the network to stabilize before migrating
-startCommand = "sh -c 'sleep 5 && python manage.py migrate --noinput && daphne -b 0.0.0.0 -p $PORT backend.asgi:application'"
+startCommand = "sh -c 'sleep 5 && python manage.py migrate --noinput && python manage.py create_staging_admin && daphne -b 0.0.0.0 -p 8000 backend.asgi:application'"
 healthcheckPath = "/"
 healthcheckTimeout = 120
