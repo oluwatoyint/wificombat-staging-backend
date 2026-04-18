@@ -215,7 +215,13 @@ CHANNEL_LAYERS = {
 # -----------------------------------------------------------------------
 # CELERY
 # -----------------------------------------------------------------------
-CELERY_BROKER_URL = REDIS_URL
+CELERY_BROKER_URL = os.getenv("REDIS_URL") or os.getenv("REDIS_PUBLIC_URL")
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {"hosts": [CELERY_BROKER_URL]},
+    },
+}
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
