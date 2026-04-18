@@ -194,7 +194,7 @@ if APP_ENV == "prod":
 # -----------------------------------------------------------------------
 # REDIS — Railway Redis plugin injects REDIS_URL automatically.
 # -----------------------------------------------------------------------
-REDIS_URL = os.getenv("REDIS_PUBLIC_URL") or os.getenv("REDIS_URL", "redis://localhost:6379")
+REDIS_URL = os.getenv("CUSTOM_REDIS_URL") or os.getenv("REDIS_PUBLIC_URL") or os.getenv("REDIS_URL", "redis://localhost:6379")
 
 CACHES = {
     "default": {
