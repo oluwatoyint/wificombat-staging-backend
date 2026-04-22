@@ -11,7 +11,7 @@ class Command(BaseCommand):
         if not User.objects.filter(email=email).exists():
             User.objects.create_superuser(
                 email=email,
-                password="WifiAdmin2024!"
+                password="WifiAdmin2024"
             )
             self.stdout.write(self.style.SUCCESS(f"Superuser {email} created successfully!"))
         else:
@@ -21,3 +21,5 @@ class Command(BaseCommand):
                 is_superuser=True
             )
             self.stdout.write(self.style.SUCCESS(f"Superuser {email} permissions updated!"))
+
+            
