@@ -15,4 +15,9 @@ class Command(BaseCommand):
             )
             self.stdout.write(self.style.SUCCESS(f"Superuser {email} created successfully!"))
         else:
-            self.stdout.write(self.style.WARNING(f"Superuser {email} already exists!"))
+            # Always ensure staff permissions are set
+            User.objects.filter(email=email).update(
+                is_staff=True,
+                is_superuser=True
+            )
+            self.stdout.write(self.style.SUCCESS(f"Superuser {email} permissions updated!"))

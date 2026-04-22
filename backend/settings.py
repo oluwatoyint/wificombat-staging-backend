@@ -33,11 +33,15 @@ DEEP_SEEK_API_KEY = env("DEEP_SEEK_API_KEY", default=None)
 # Supports: production domain, Railway auto-generated URLs, Vercel preview
 # -----------------------------------------------------------------------
 ALLOWED_HOSTS = [
-    "backend.wificombatelearn.com",
-    ".railway.app",      # Allows any Railway-provided URL
+    ".railway.app",      # Allows any Railway-provided URL (like your staging link)
     "localhost",         # Allows local testing
     "127.0.0.1",
 ]
+
+# This is great—keep this as it captures the specific public domain injected by Railway
+RAILWAY_PUBLIC_DOMAIN = os.getenv("RAILWAY_PUBLIC_DOMAIN")
+if RAILWAY_PUBLIC_DOMAIN:
+    ALLOWED_HOSTS.append(RAILWAY_PUBLIC_DOMAIN)
 
 # Railway injects RAILWAY_PUBLIC_DOMAIN automatically
 RAILWAY_PUBLIC_DOMAIN = os.getenv("RAILWAY_PUBLIC_DOMAIN")
